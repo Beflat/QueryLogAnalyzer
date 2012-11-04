@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+    
+<head>
+    
+    <meta charset="UTF-8">
+    
+    <title>allログ解析ツール</title>
+    
+    <script src="./js/graph.js">
+    </script>
+    
+    <script>
+var overlapView = null;
+
+function initialize() {
+    
+    overlapView = new OverlapView('canvas');
+    
+    overlapView.addItem(new Item('test1', 10050, 10500));
+    overlapView.addItem(new Item('test2', 10100, 10400));
+    overlapView.addItem(new Item('test3', 10000, 10040));
+    overlapView.addItem(new Item('test4', 10001, 10002));
+    overlapView.addItem(new Item('test5', 10001, 10002));
+    overlapView.addItem(new Item('test6', 10002, 10003));
+    overlapView.addItem(new Item('test7', 10060, 10090));
+    overlapView.addItem(new Item('test8', 10200, 10500));
+    overlapView.setRenderRange(10000, 10060);
+    
+    overlapView.render();
+}
+    </script>
+    
+</head>
+
+<body onLoad="initialize();">
+    
+    <div>
+        <canvas id="canvas" width="800" height="200">Canvasに対応したブラウザが必要です。</canvas>
+    </div>
+    
+</body>
+
+</html>
