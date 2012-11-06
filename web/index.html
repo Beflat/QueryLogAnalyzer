@@ -17,14 +17,14 @@ function initialize() {
     
     overlapView = new OverlapView('canvas');
     
-    overlapView.addItem(new Item('test1', 10050, 10500));
-    overlapView.addItem(new Item('test2', 10100, 10400));
-    overlapView.addItem(new Item('test3', 10000, 10040));
-    overlapView.addItem(new Item('test4', 10001, 10002));
-    overlapView.addItem(new Item('test5', 10001, 10002));
-    overlapView.addItem(new Item('test6', 10002, 10003));
-    overlapView.addItem(new Item('test7', 10060, 10090));
-    overlapView.addItem(new Item('test8', 10200, 10500));
+    overlapView.addItem(new Item('132',   10100, 10400, {'id': 132, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1\nINSERT INTO ip_addr SET ip_addr='180.23.102.13', created='2012-11-04 14:30:01'\nSELECT reg_id FROM reg_id_list ORDER BY id"}));
+    overlapView.addItem(new Item('133',   10100, 10400, {'id': 133, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
+    overlapView.addItem(new Item('134',   10000, 10040, {'id': 134, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
+    overlapView.addItem(new Item('135',   10001, 10002, {'id': 135, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
+    overlapView.addItem(new Item('136', 10001, 10002, {'id': 136, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
+    overlapView.addItem(new Item('137', 10002, 10003, {'id': 137, 'query': "SELECT r0_.id AS id0, r0_.title AS title1, r0_.url AS url2, r0_.status AS status3, r0_.log AS log4, r0_.created AS created5, r0_.updated AS updated6, r0_.rule_id AS rule_id7 FROM request r0_ WHERE r0_.status = 0"}));
+    overlapView.addItem(new Item('138', 10060, 10090, {'id': 136, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
+    overlapView.addItem(new Item('139', 10200, 10500, {'id': 136, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
     overlapView.setRenderRange(10000, 10060);
     
     overlapView.render();
@@ -36,7 +36,7 @@ function initialize() {
 <body onLoad="initialize();">
     
     <div>
-        <canvas id="canvas" width="800" height="200">Canvasに対応したブラウザが必要です。</canvas>
+        <canvas id="canvas" width="900" height="250">Canvasに対応したブラウザが必要です。</canvas>
     </div>
     
 </body>

@@ -262,22 +262,27 @@ RenderingContext.prototype = {
 /**
  * Canvas上に描画されるオブジェクト
  */
-Item = function(title, startTime, endTime) {
+Item = function(id, startTime, endTime, data) {
 	this.init.apply(this, arguments);
 }
 Item.prototype = {
 	
-	title: '',
+	id: '',
 	startTime: 0,
 	endTime: 0,
+	data: {},
 	
-	init: function(title, startTime, endTime) {
-		this.title = title;
+	init: function(id, startTime, endTime, data) {
+		this.id = id;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.data = data;
 		if(startTime > endTime) {
 			this.endTime = startTime;
 			this.startTime = endTime;
+		}
+		if(startTime == endTime) {
+			this.endTime++;
 		}
 	},
 	
@@ -311,6 +316,30 @@ Item.prototype = {
 		context.lineTo(renderingContext.baseX + endX,   renderingContext.baseY + startY);
 		context.stroke();
 		
+	},
+	
+	getData: function(key) {
+		if(!this.hasData(key)) {
+			return null;
+		}
+		return this.data[key];
+	},
+	getDataOr: function(key, def) {
+		if(!this.hasData(key)) {
+			return def;
+		}
+		return this.data[key];
+	},
+	
+	hasData: function(key) {
+		if(this.data[key]) {
+			return true;
+		}
+		return false;
+	},
+	
+	getAllData: function() {
+		return this.data;
 	},
 	
 	/**

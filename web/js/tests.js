@@ -1,16 +1,16 @@
 
 test( "Item: 初期化", function() {
-	item = new Item('aa', 100, 200);
+	item = new Item('aa', 100, 200, {});
 	ok(item.startTime == 100, '開始時間');
 	ok(item.endTime == 200, '終了時間');
 	
-	item = new Item('aa', 200, 100);
+	item = new Item('aa', 200, 100, {});
 	ok(item.startTime == 100, '開始時間(開始と終了を間違って指定した場合)');
 	ok(item.endTime == 200, '終了時間(開始と終了を間違って指定した場合)');
 });
 
 test( "Item: 描画境界の確認", function() {
-	item = new Item('aa', 100, 200);
+	item = new Item('aa', 100, 200, {});
 	ok(item.isRenderTarget(200, 300) == false, 'アイテムが画面左側の外にある');
 	ok(item.isRenderTarget(199, 300) == true,  'アイテムの左側が画面外');
 	ok(item.isRenderTarget(100, 200) == true,  'アイテムが画面と同じサイズ');
@@ -20,9 +20,9 @@ test( "Item: 描画境界の確認", function() {
 });
 
 test("RenderingContext: 重複の確認", function() {
-	a = new Item('aa', 100, 200);
-	b = new Item('aa', 201, 300);
-	c = new Item('aa', 301, 400);
+	a = new Item('aa', 100, 200, {});
+	b = new Item('aa', 201, 300, {});
+	c = new Item('aa', 301, 400, {});
 	renderingContext = new RenderingContext(null, 100, 100);
 	
 	renderingContext.registerItem(a);
@@ -33,9 +33,9 @@ test("RenderingContext: 重複の確認", function() {
 	ok(renderingContext.getOverlappedCount(b) == 0, 'b -> 誰とも重なり合っていない');
 	ok(renderingContext.getOverlappedCount(c) == 0, 'c -> 誰とも重なり合っていない');
 	
-	a2 = new Item('aa', 100, 200);
-	b2 = new Item('aa', 200, 300);
-	c2 = new Item('aa', 301, 400);
+	a2 = new Item('aa', 100, 200, {});
+	b2 = new Item('aa', 200, 300, {});
+	c2 = new Item('aa', 301, 400, {});
 	renderingContext2 = new RenderingContext(null, 100, 100);
 	
 	renderingContext2.registerItem(a2);
@@ -46,3 +46,19 @@ test("RenderingContext: 重複の確認", function() {
 	ok(renderingContext2.getOverlappedCount(b2) == 1, 'b -> aと重なっている');
 	ok(renderingContext2.getOverlappedCount(c2) == 0, 'c -> 誰とも重なり合っていない');
 });
+
+test("Itemからのデータ取得関連", function(){
+	
+	var item = new Item('id', 100, 200, {'key1': 1, 'key2': 2});
+	
+	ok(item.hasData('key1'), 'キーが存在する');
+	ok(item.hasData('xxx') == false, 'キーが存在しない');
+	ok(item.getData('key1') == 1, '存在するキーの値を取得');
+	ok(item.getData('xxx') == null, '存在しないキーの値を取得');
+	ok(item.getDataOr('key2', 100) == 2, '存在するキーの値を取得(getDataOr)');
+	ok(item.getDataOr('xxx', 100) == 100, '存在しないキーの値を取得(getDataOr)');
+	
+	var data = item.getAllData();
+	ok(data['key1'] == 1, 'getAllDataから取得した値(1)');
+	ok(data['key2'] == 2, 'getAllDataから取得した値(2)');
+})
