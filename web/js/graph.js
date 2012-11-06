@@ -44,12 +44,12 @@ OverlapView.prototype = {
 		canvasElement.addEventListener('mousemove',  function(e) { return self._onMouseMove(e);}, false);
 		canvasElement.addEventListener('mousedown',  function(e) { return self._onMouseDown(e);}, false);
 		canvasElement.addEventListener('mouseup',    function(e) { return self._onMouseUp(e);},   false);
-		canvasElement.addEventListener('wheel',      function(e) { return self._onWheel(e);},     false);
+		canvasElement.addEventListener('DOMMouseScroll', function(e) { return self._onWheel(e);},     false);
 		canvasElement.addEventListener('mousewheel', function(e) { return self._onWheel(e);},     false);
 		this.width = canvasElement.width;
 		this.height = canvasElement.height;
 		
-		var minDate = new Date('2037-12-31 23:59:59');
+		var minDate = new Date('2037-12-31');
 		this.minTime = minDate.getTime() / 1000;
 		this.maxTime = 0;
 		this.renderFrom = 0;
@@ -137,17 +137,25 @@ OverlapView.prototype = {
 			return false;
 		}
 		var length = this.renderTo - this.renderFrom;
-		var velocity = (length / 30);
+		var velocity = (length / 25);
 		if(this._prevMouseX > e.clientX) {
-			this.renderFrom = Math.min(this.renderFrom + velocity, this.maxTime - length);
-			this.renderTo = this.renderFrom + length;
-			
+			this._scroll(velocity);
 		} else if(this._prevMouseX < e.clientX) {
-			this.renderFrom = Math.max(this.renderFrom - velocity, this.minTime);
-			this.renderTo = this.renderFrom + length;
+			this._scroll(-velocity);
 		}
 		this._prevMouseX = e.clientX;
 		this.render();
+	},
+	
+	_scroll: function(velocity) {
+		var length = this.renderTo - this.renderFrom;
+		if(velocity > 0) {
+			this.renderFrom = Math.min(this.renderFrom + velocity, this.maxTime - length);
+			this.renderTo = this.renderFrom + length;
+		} else {
+			this.renderFrom = Math.max(this.renderFrom + velocity, this.minTime);
+			this.renderTo = this.renderFrom + length;
+		}
 	},
 	
 	/**
@@ -175,11 +183,22 @@ OverlapView.prototype = {
 			//firefox
 			d = e.detail;
 		}
-		if(d > 0) {
-			this.renderTo = Math.max(this.renderTo - 10, this.renderFrom);
+		
+		var length = this.renderTo - this.renderFrom;
+		var velocity = length / 20;
+		if(e.shiftKey) {
+			//Shiftキーの場合はスクロール
+			this._scroll((d > 0) ? -velocity : velocity);
 		} else {
-			this.renderTo = this.renderTo + 10;
+			//通常時はズーム
+			if(d > 0) {
+				this.renderTo = this.renderTo + 10;
+			} else {
+				this.renderTo = Math.max(this.renderTo - 10, this.renderFrom + 30);
+			}
+			
 		}
+		
 		this.render();
 	}
 }
@@ -331,29 +350,47 @@ DefaultAxisRenderer = function() {
 }
 DefaultAxisRenderer.prototype = {
 	
+	
 	render: function(renderingContext) {
 		var context = renderingContext.context;
 		
 		
 		var timeSize = renderingContext.renderTo - renderingContext.renderFrom;
-		var from = 0;
-		var to = timeSize;
 		var canvasSize = renderingContext.baseW - renderingContext.baseX;
 		
-		var legendInterval = 100;
+		var scale = 10;
+		if((5 / timeSize) * canvasSize >= 50) {
+			scale = 1;
+		}
+		else if((10 / timeSize) * canvasSize >= 50) {
+			scale = 5;
+		}
+		else if((20 / timeSize) * canvasSize >= 50) {
+			scale = 10;
+		}
+		else if((40 / timeSize) * canvasSize >= 50) {
+			scale = 20;
+		} else {
+			scale = 30;
+		}
+		
+		
+		var from = scale - (renderingContext.renderFrom % scale);
+		var to = timeSize;
+		
 		var legendPos = 0;
 		var time = 0;
 		var pos = 0, x = 0, y = renderingContext.baseY;
-		for(time=from; time <= to; time+=10) {
+		for(time=from; time <= to; time+=scale) {
 			pos = (time / timeSize) * canvasSize;
 			x = renderingContext.baseX + pos;
 			
 			context.beginPath();
-			if(pos >= legendPos * legendInterval) {
+			if((renderingContext.renderFrom + time) % 60 == 0) {
 				//凡例を描画するタイミング
 				context.font = "10pt Arial";
 				context.textAlign = 'center';
-				legendPos++;
+				legendPos = pos;
 				context.fillText(this._getDateString(renderingContext.renderFrom + time), x, renderingContext.baseY-5);
 				context.strokeStyle = '#444';
 				context.lineWidth = 0.5;
@@ -374,7 +411,7 @@ DefaultAxisRenderer.prototype = {
 			
 		}
 	},
-	
+		
 	/**
 	 * UnixTimeStamp -> 時間文字列への変換。
 	 */
