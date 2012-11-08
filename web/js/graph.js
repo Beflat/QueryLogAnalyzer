@@ -389,6 +389,12 @@ Item.prototype = {
 		context.restore();
 	},
 	
+	getStartTimeString: function() {
+		return this._getDateString(this.startTime);
+	},
+	getEndTimeString: function() {
+		return this._getDateString(this.endTime);
+	},
 	getData: function(key) {
 		if(!this.hasData(key)) {
 			return null;
@@ -470,6 +476,14 @@ Item.prototype = {
 		//状態の変化がなかった場合、後続の要素の処理を続行させるためtrueを返す。
 		return true;
 	},
+	/**
+	 * UnixTimeStamp -> 時間文字列への変換。
+	 */
+	_getDateString: function(timeStamp) {
+		var date = new Date(timeStamp*1000);
+		
+		return [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
+	}
 	
 }
 

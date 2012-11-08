@@ -22,8 +22,8 @@ function initialize() {
     overlapView = new OverlapView('canvas');
     overlapView.onItemSelectChange = function(item) {
         $('#conn-id').text(item.id);
-        $('#start-time').text(item.startTime);
-        $('#end-time').text(item.endTime);
+        $('#start-time').text(item.getStartTimeString());
+        $('#end-time').text(item.getEndTimeString());
         $('#queries').html(item.data.query.split("\n").join("<br>"));
     }
     
@@ -57,19 +57,19 @@ function initialize() {
         <table class="table table-bordered table-striped table-condenced">
             <tr>
                 <th>ID:</th>
-                <td id="conn-id">aaaa</td>
+                <td id="conn-id">---</td>
             </tr>
             <tr>
                 <th>START:</th>
-                <td id="start-time"></td>
+                <td id="start-time">---</td>
             </tr>
             <tr>
                 <th>END:</th>
-                <td id="end-time"></td>
+                <td id="end-time">---</td>
             </tr>
             <tr>
                 <th>QUERIES:</th>
-                <td id="queries"></td>
+                <td id="queries">---</td>
             </tr>
         </table>
         
