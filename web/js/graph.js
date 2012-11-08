@@ -362,14 +362,31 @@ Item.prototype = {
 		//クリッピング
 		startX = Math.max(startX, 0);
 		endX   = Math.min(endX, canvasSize);
-		
+		context.save();
+		var offsetY = 0;
 		context.beginPath();
-		context.lineWidth = (this.state == this.STATE_NORMAL ) ? 3 : 6;
-		context.strokeStyle = (this.state == this.STATE_NORMAL ) ? '#09f' : '#bbf';
-		context.moveTo(renderingContext.baseX + startX, renderingContext.baseY + this._renderY);
-		context.lineTo(renderingContext.baseX + endX,   renderingContext.baseY + this._renderY);
+		if(this.state == this.STATE_NORMAL) {
+			context.shadowOffsetX = 1;
+			context.shadowOffsetY = 1;
+			context.shadowBlur = 2;
+			context.shadowColor = 'rgba(0, 0, 0, 0.3)';			
+			context.strokeStyle = '#3A8FFF';
+			context.lineWidth = 4;
+			offsetY = 0;
+		} else if(this.state == this.STATE_MOUSE_HOVER) {
+			context.shadowOffsetX = 2;
+			context.shadowOffsetY = 2;
+			context.shadowBlur = 2;
+			context.shadowColor = 'rgba(0, 0, 0, 0.3)';			
+			context.strokeStyle = '#265DA5';
+			context.lineWidth = 4;
+			offsetY = -1;
+		}
+		context.moveTo(renderingContext.baseX + startX, renderingContext.baseY + this._renderY + offsetY);
+		context.lineTo(renderingContext.baseX + endX,   renderingContext.baseY + this._renderY + offsetY);
 		context.stroke();
 		
+		context.restore();
 	},
 	
 	getData: function(key) {
