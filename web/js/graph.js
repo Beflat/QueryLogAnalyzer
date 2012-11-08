@@ -64,6 +64,12 @@ OverlapView.prototype = {
 	},
 	
 	addItem: function(item) {
+		
+		var self = this;
+		item.onSelect = function(i) {
+			return self._onItemSelectChange(i);
+		}
+		
 		this.items.push(item);
 		if(item.endTime > this.maxTime) {
 			this.maxTime = item.endTime;
@@ -132,8 +138,10 @@ OverlapView.prototype = {
 	 * マウス移動時のイベントハンドラ
 	 */
 	_onMouseMove: function(e) {
-		if(this.state != this.STATE_DRAG_SCROLL) {
+		if(this.state == this.STATE_NORMAL) {
+			//通常時は配下のItemにイベントを伝搬する。
 			this._prevMouseX = e.clientX;
+			this._onMouseMoveAroundItems(e.clientX, e.clientY);
 			return false;
 		}
 		var length = this.renderTo - this.renderFrom;
@@ -200,7 +208,38 @@ OverlapView.prototype = {
 		}
 		
 		this.render();
-	}
+	},
+	
+	/**
+	 * 各Itemに対してmousemoveイベントを伝搬させる。
+	 */
+	_onMouseMoveAroundItems: function(mouseX, mouseY) {
+		var item = 0;
+		var pos = 0;
+		for(i in this.items) {
+			if(!this.items[i].isOverlapped(this.renderFrom, this.renderTo)) {
+				continue;
+			}
+			
+			var canvasSize = this.width - this.GRAPH_PADDING_LEFT - this.GRAPH_PADDING_RIGHT;
+			var timeLength = this.renderTo - this.renderFrom;
+			
+			pos = ((mouseX - this.GRAPH_PADDING_LEFT) / canvasSize) * timeLength + this.renderFrom;
+			
+			if(!this.items[i].onMouseMove(pos, mouseY - this.GRAPH_PADDING_TOP)) {
+				this.render();
+				break;
+			}
+		}
+
+	},
+	
+	/**
+	 * アイテムの選択が変化した。
+	 */
+	_onItemSelectChange: function(item) {
+		console.log(item.id);
+	},
 }
 
 /**
@@ -250,12 +289,12 @@ RenderingContext.prototype = {
 			if(this.items[i] === item) {
 				continue;
 			}
-			if(this.items[i].isOverlapped(item)) {
+			if(this.items[i].isOverlapped(item.startTime, item.endTime)) {
 				overlapped++;
 			}
 		}
 		return overlapped;
-	}
+	},
 }
 
 
@@ -267,16 +306,27 @@ Item = function(id, startTime, endTime, data) {
 }
 Item.prototype = {
 	
+	//定数
+	STATE_NORMAL: 0,
+	STATE_MOUSE_HOVER: 1,
+		
 	id: '',
 	startTime: 0,
 	endTime: 0,
+	state: this.STATE_NORMAL,
 	data: {},
+	onSelect: null,
+	
+	_renderY: -1,
 	
 	init: function(id, startTime, endTime, data) {
 		this.id = id;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.state = this.STATE_NORMAL;
 		this.data = data;
+		this.onSelect = null;
+		this._renderY = -1;
 		if(startTime > endTime) {
 			this.endTime = startTime;
 			this.startTime = endTime;
@@ -303,17 +353,20 @@ Item.prototype = {
 		
 		var startX     = (relativeStartPos / timeLength) * canvasSize;
 		var endX       = (relativeEndPos   / timeLength) * canvasSize;
-		var startY     = 10 + renderingContext.getOverlappedCount(this) * 10;
+		
+		if(this._renderY == -1) {
+			this._renderY = 10 + renderingContext.getOverlappedCount(this) * 10;
+		}
 		
 		//クリッピング
 		startX = Math.max(startX, 0);
-		endX   = Math.min(endX,   canvasSize);
+		endX   = Math.min(endX, canvasSize);
 		
 		context.beginPath();
-		context.lineWidth = 3;
-		context.strokeStyle = '#09f';
-		context.moveTo(renderingContext.baseX + startX, renderingContext.baseY + startY);
-		context.lineTo(renderingContext.baseX + endX,   renderingContext.baseY + startY);
+		context.lineWidth = (this.state == this.STATE_NORMAL ) ? 3 : 6;
+		context.strokeStyle = (this.state == this.STATE_NORMAL ) ? '#09f' : '#bbf';
+		context.moveTo(renderingContext.baseX + startX, renderingContext.baseY + this._renderY);
+		context.lineTo(renderingContext.baseX + endX,   renderingContext.baseY + this._renderY);
 		context.stroke();
 		
 	},
@@ -359,15 +412,47 @@ Item.prototype = {
 	/**
 	 * このオブジェクトが指定されたItemと時間的に重なっているかを返す。
 	 */
-	isOverlapped: function(item) {
-		if(this.startTime >= item.startTime && this.startTime <= item.endTime) {
+	isOverlapped: function(from, to) {
+		if(this.startTime >= from && this.startTime <= to) {
 			return true;
 		}
-		if(this.endTime >= item.startTime && this.startTime <= item.endTime) {
+		if(this.endTime >= from && this.startTime <= to) {
 			return true;
 		}
 		return false;
 	},
+	
+	/**
+	 * @param int time マウス位置の時間(単位：秒)
+	 * @param int mouseY マウスのY座標。Canvasからグラフ領域までのオフセットは減算済。
+	 */
+	onMouseMove: function(time, mouseY) {
+		var newState = this.state;
+		
+		if(!this.isOverlapped(time - 1, time)) {
+			//マウスがX軸で重なっていない。
+			newState = this.STATE_NORMAL;
+		} else if(this._renderY != -1 && Math.abs(mouseY - this._renderY - 10) <= 3) {
+			//Y座標の差が3以内ならカーソルが触れていると判断する。
+			newState = this.STATE_MOUSE_HOVER;
+		} else {
+			newState = this.STATE_NORMAL;
+		}
+		
+		if(newState != this.state) {
+			//状態が変化した場合、イベントを消化する。
+			//後続の処理を防止するため、falseを返す。
+			this.state = newState;
+			if(this.state == this.STATE_MOUSE_HOVER && this.onSelect != null) {
+				this.onSelect(this);
+			}
+			return false;
+		}
+		
+		//状態の変化がなかった場合、後続の要素の処理を続行させるためtrueを返す。
+		return true;
+	},
+	
 }
 
 
