@@ -7,6 +7,10 @@
     
     <title>allログ解析ツール</title>
     
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    
     <script src="./js/graph.js">
     </script>
     
@@ -16,6 +20,12 @@ var overlapView = null;
 function initialize() {
     
     overlapView = new OverlapView('canvas');
+    overlapView.onItemSelectChange = function(item) {
+        $('#conn-id').text(item.id);
+        $('#start-time').text(item.startTime);
+        $('#end-time').text(item.endTime);
+        $('#queries').html(item.data.query.split("\n").join("<br>"));
+    }
     
     overlapView.addItem(new Item('132',   10100, 10400, {'id': 132, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1\nINSERT INTO ip_addr SET ip_addr='180.23.102.13', created='2012-11-04 14:30:01'\nSELECT reg_id FROM reg_id_list ORDER BY id"}));
     overlapView.addItem(new Item('133',   10100, 10400, {'id': 133, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
@@ -35,10 +45,35 @@ function initialize() {
 
 <body onLoad="initialize();">
     
-    <div>
-        <canvas id="canvas" width="900" height="250">Canvasに対応したブラウザが必要です。</canvas>
-    </div>
+    <div class="container">
     
+        <br>
+        <br>
+        <br>
+        <div>
+            <canvas id="canvas" width="900" height="250">Canvasに対応したブラウザが必要です。</canvas>
+        </div>
+        
+        <table class="table table-bordered table-striped table-condenced">
+            <tr>
+                <th>ID:</th>
+                <td id="conn-id">aaaa</td>
+            </tr>
+            <tr>
+                <th>START:</th>
+                <td id="start-time"></td>
+            </tr>
+            <tr>
+                <th>END:</th>
+                <td id="end-time"></td>
+            </tr>
+            <tr>
+                <th>QUERIES:</th>
+                <td id="queries"></td>
+            </tr>
+        </table>
+        
+    </div>
 </body>
 
 </html>

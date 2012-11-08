@@ -67,7 +67,7 @@ OverlapView.prototype = {
 		
 		var self = this;
 		item.onSelect = function(i) {
-			return self._onItemSelectChange(i);
+			return self.onItemSelectChange(i);
 		}
 		
 		this.items.push(item);
@@ -113,6 +113,12 @@ OverlapView.prototype = {
 	},
 	
 	/**
+	 * アイテムの選択が変化した。
+	 */
+	onItemSelectChange: function(item) {
+	},
+	
+	/**
 	 * Canvasの枠部分を描画する。
 	 */
 	_renderBorder: function(context) {
@@ -138,20 +144,21 @@ OverlapView.prototype = {
 	 * マウス移動時のイベントハンドラ
 	 */
 	_onMouseMove: function(e) {
+		
 		if(this.state == this.STATE_NORMAL) {
 			//通常時は配下のItemにイベントを伝搬する。
-			this._prevMouseX = e.clientX;
-			this._onMouseMoveAroundItems(e.clientX, e.clientY);
+			this._prevMouseX = e.offsetX;
+			this._onMouseMoveAroundItems(e.offsetX, e.offsetY);
 			return false;
 		}
 		var length = this.renderTo - this.renderFrom;
 		var velocity = (length / 25);
-		if(this._prevMouseX > e.clientX) {
+		if(this._prevMouseX > e.offsetX) {
 			this._scroll(velocity);
-		} else if(this._prevMouseX < e.clientX) {
+		} else if(this._prevMouseX < e.offsetX) {
 			this._scroll(-velocity);
 		}
-		this._prevMouseX = e.clientX;
+		this._prevMouseX = e.offsetX;
 		this.render();
 	},
 	
@@ -234,12 +241,6 @@ OverlapView.prototype = {
 
 	},
 	
-	/**
-	 * アイテムの選択が変化した。
-	 */
-	_onItemSelectChange: function(item) {
-		console.log(item.id);
-	},
 }
 
 /**
@@ -429,10 +430,10 @@ Item.prototype = {
 	onMouseMove: function(time, mouseY) {
 		var newState = this.state;
 		
-		if(!this.isOverlapped(time - 1, time)) {
+		if(!this.isOverlapped(time, time)) {
 			//マウスがX軸で重なっていない。
 			newState = this.STATE_NORMAL;
-		} else if(this._renderY != -1 && Math.abs(mouseY - this._renderY - 10) <= 3) {
+		} else if(this._renderY != -1 && Math.abs(mouseY - this._renderY) <= 3) {
 			//Y座標の差が3以内ならカーソルが触れていると判断する。
 			newState = this.STATE_MOUSE_HOVER;
 		} else {
@@ -544,6 +545,20 @@ function debugObj(obj) {
 		buffer += '[' + typeof(obj.i) + '] ' + i;
 		buffer += ': ';
 		buffer += obj.i;
+		
+		console.log(buffer);
+	}
+}
+
+
+function debugKeys(obj, keys) {
+	var buffer = '';
+	var val = '';
+	for(i in keys) {
+		val = keys[i];
+		buffer = '';
+		buffer += '[' + typeof(obj[val]) + '] ' + val;
+		buffer += ': ' + obj[val];
 		
 		console.log(buffer);
 	}
