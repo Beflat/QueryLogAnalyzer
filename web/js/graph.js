@@ -145,20 +145,30 @@ OverlapView.prototype = {
 	 */
 	_onMouseMove: function(e) {
 		
+		var mouseX = 0, mouseY = 0;
+		if(e.offsetX != undefined) {
+			mouseX = e.offsetX;
+			mouseY = e.offsetY;
+		} else {
+			var canvas = document.getElementById(this.id);
+			mouseX = e.clientX - canvas.offsetLeft;
+			mouseY = e.clientY - canvas.offsetTop;
+		}
+		
 		if(this.state == this.STATE_NORMAL) {
 			//通常時は配下のItemにイベントを伝搬する。
-			this._prevMouseX = e.offsetX;
-			this._onMouseMoveAroundItems(e.offsetX, e.offsetY);
+			this._prevMouseX = mouseX;
+			this._onMouseMoveAroundItems(mouseX, mouseY);
 			return false;
 		}
 		var length = this.renderTo - this.renderFrom;
 		var velocity = (length / 25);
-		if(this._prevMouseX > e.offsetX) {
+		if(this._prevMouseX > mouseX) {
 			this._scroll(velocity);
-		} else if(this._prevMouseX < e.offsetX) {
+		} else if(this._prevMouseX <mouseX) {
 			this._scroll(-velocity);
 		}
-		this._prevMouseX = e.offsetX;
+		this._prevMouseX = mouseX;
 		this.render();
 	},
 	
