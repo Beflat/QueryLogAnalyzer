@@ -19,6 +19,8 @@ class TriableStreamReader {
      */
     protected $tryBuffer;
     
+    protected $lineNo = 0;
+    
     /**
      * 
      * @param resource $fd
@@ -32,6 +34,7 @@ class TriableStreamReader {
         
         $this->fd = $fd;
         $this->tryBuffer = null;
+        $this->lineNo = 0;
     }
     
     /**
@@ -39,12 +42,13 @@ class TriableStreamReader {
      * @return string
      */
     public function getLine() {
+        $this->lineNo++;
         if($this->tryBuffer !== null) {
             $buffer = $this->tryBuffer;
             $this->tryBuffer = null;
             return $buffer;
         }
-        return rtrim(fgets($this->fd, 4096));
+        return rtrim(fgets($this->fd, 4096), "\r\n");
     }
     
     /**
@@ -55,7 +59,7 @@ class TriableStreamReader {
         if($this->tryBuffer !== null) {
             return $this->tryBuffer;
         }
-        $this->tryBuffer = rtrim(fgets($this->fd, 4096));
+        $this->tryBuffer = rtrim(fgets($this->fd, 4096), "\r\n");
         return $this->tryBuffer;
     }
     
@@ -70,4 +74,8 @@ class TriableStreamReader {
         return feof($this->fd);
     }
     
+    
+    public function getLineNo() {
+        return $this->lineNo;
+    }
 }

@@ -1,0 +1,9 @@
+/usr/libexec/mysqld, Version: 5.5.27-log (MySQL Community Server (GPL)). started with:
+Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
+Time                 Id Command    Argument
+121104 14:30:01	  132 Connect	ipnotifier@localhost on ipnotifier
+		  132 Query	SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1
+		  132 Query	INSERT INTO ip_addr SET ip_addr='180.23.102.13', created='2012-11-04 14:30:01'
+		  132 Query	SELECT reg_id FROM reg_id_list ORDER BY id
+		  132 Quit	
+121104 14:40:01	  133 Connect	ipnotifier@localhost on ipnotifier

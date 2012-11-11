@@ -1,0 +1,8 @@
+/usr/libexec/mysqld, Version: 5.5.27-log (MySQL Community Server (GPL)). started with:
+Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
+Time                 Id Command    Argument
+121104 15:15:02	  137 Connect	cc@localhost on cc
+		  138 Connect	ipnotifier@localhost on ipnotifier
+		  137 Query	SET NAMES UTF8
+		  138 Query	SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1
+121104 15:15:10	  137 Query	SELECT r0_.id AS id0, r0_.title AS title1, r0_.url AS url2, r0_.status AS status3, r0_.log AS log4, r0_.created AS created5, r0_.updated AS updated6, r0_.rule_id AS rule_id7 FROM request r0_ WHERE r0_.status = 0
