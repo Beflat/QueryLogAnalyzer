@@ -87,6 +87,10 @@ class LogicalEntry {
     }
     
     
+    public function getAllExtra() {
+        return $this->extraData;
+    }
+    
     public function getExtra($key, $default='') {
         if(!isset($this->extraData[$key])) {
             return $default;

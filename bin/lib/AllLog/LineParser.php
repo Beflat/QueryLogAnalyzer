@@ -31,11 +31,11 @@ class AllLog_LineParser {
      */
     public function isAllLogLine($line) {
         //日付を含むAllLogの行データか
-        if(preg_match('#^[0-9]+ [0-9:]+\t\s+[0-9]+\s\w+#', $line)) {
+        if(preg_match('#^[0-9]+ [\s0-9:]+?\t\s+[0-9]+\s[\w\s]+?\t+#', $line)) {
             return true;
         }
         //日付を含まないAllLogの行データか
-        if(preg_match('#^\t\t\s+\d+\s\w+#', $line)) {
+        if(preg_match('#^\t\t\s+\d+\s[\w\s]+\t#', $line)) {
             return true;
         }
         return false;
@@ -59,9 +59,9 @@ class AllLog_LineParser {
         $line = $fileReader->getLine();
         $result = array();
         //時刻を含む構文でマッチするか確認する。
-        if(!preg_match('#^(?<time>[0-9]+ [0-9:]+)\t\s+(?<id>[0-9]+)\s(?<command>\w+)\t(?<args>.*)$#', $line, $result)) {
+        if(!preg_match('#^(?<time>[0-9]+ [\s0-9:]+?)\t\s+(?<id>[0-9]+)\s(?<command>[\w\s]+?)\t(?<args>.*)$#', $line, $result)) {
             //上の構文でマッチしない場合、時刻なしバージョンでマッチするか確認する。
-            if(!preg_match('#\t\t\s+(?<id>\d+) (?<command>\w+)\t(?<args>.*)$#', $line, $result)) {
+            if(!preg_match('#\t\t\s+(?<id>\d+) (?<command>[\w\s]+?)\t(?<args>.*)$#', $line, $result)) {
                 //これでもマッチしない場合はエラー
                 throw new UnexpectedValueException('無効なフォーマットです。Line:' . $fileReader->getLineNo());
             }
