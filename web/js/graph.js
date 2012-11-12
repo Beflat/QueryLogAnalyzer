@@ -63,6 +63,12 @@ OverlapView.prototype = {
 		this.renderTo = to;
 	},
 	
+	clearItems: function() {
+		for(i in this.items) {
+			this.items[i].detach();
+		}
+		this.items = [];
+	},
 	addItem: function(item) {
 		
 		var self = this;
@@ -114,6 +120,7 @@ OverlapView.prototype = {
 	
 	/**
 	 * アイテムの選択が変化した。
+	 * 利用者が処理を上書きして使用する。
 	 */
 	onItemSelectChange: function(item) {
 	},
@@ -486,6 +493,16 @@ Item.prototype = {
 		//状態の変化がなかった場合、後続の要素の処理を続行させるためtrueを返す。
 		return true;
 	},
+	
+	
+	/**
+	 * 親のCanvasから削除される際に呼び出される。
+	 * 循環参照の解消などを行う。
+	 */
+	detach: function() {
+		this.onSelect = null;
+	},
+	
 	/**
 	 * UnixTimeStamp -> 時間文字列への変換。
 	 */

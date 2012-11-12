@@ -23,18 +23,22 @@ class Converter_Json implements Converter_Interface {
             throw new RuntimeException('ファイルのオープンに失敗しました。: ' . $filePath);
         }
         
-        fputs($fp, "{\n");
+        fputs($fp, "[\n");
         
-        foreach($entries as $entry) {
+        $lastEntryIndex = count($entries) - 1;
+        foreach($entries as $idx=>$entry) {
+            $first = false;
             $data = array(
                 'id'    => $entry->getId(),
                 'from'  => $entry->getFrom(),
                 'to'    => $entry->getTo(),
                 'extra' => $entry->getAllExtra(),
             );
-            fputs($fp, json_encode($data) . ",\n");
+            $tail = ($idx == $lastEntryIndex) ? "\n" : ",\n";
+            fputs($fp, json_encode($data) . $tail);
         }
-        fputs($fp, "}\n");
+        
+        fputs($fp, "]\n");
     }
     
     

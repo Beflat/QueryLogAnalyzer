@@ -11,35 +11,97 @@
     <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
     <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
     
-    <script src="./js/graph.js">
-    </script>
+    <script src="./js/graph.js"></script>
     
     <script>
 var overlapView = null;
 
 function initialize() {
     
+    var fileUpload = document.getElementById('file-upload');
+    fileUpload.addEventListener('dragover', onDragOver, false);
+    fileUpload.addEventListener('drop', onFileDrop, false);
+    
     overlapView = new OverlapView('canvas');
     overlapView.onItemSelectChange = function(item) {
+        //canvas上でアイテムの選択が変化した場合の処理。
         $('#conn-id').text(item.id);
         $('#start-time').text(item.getStartTimeString());
         $('#end-time').text(item.getEndTimeString());
-        $('#queries').html(item.data.query.split("\n").join("<br>"));
+        
+        
+        if(item.data['Connect'] != undefined && item.data['Connect'].join) {
+            $('#connection').html(item.data.Connect.join("<br>"));
+        } else {
+            $('#connection').html(item.data.Connect);
+        }
+        if(item.data['Query'] != undefined && item.data['Query'].join) {
+            $('#queries').html(item.data.Query.join("<br>"));
+        } else {
+            $('#queries').html(item.data.Query);
+        }
     }
-    
-    overlapView.addItem(new Item('132',   10100, 10400, {'id': 132, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1\nINSERT INTO ip_addr SET ip_addr='180.23.102.13', created='2012-11-04 14:30:01'\nSELECT reg_id FROM reg_id_list ORDER BY id"}));
-    overlapView.addItem(new Item('133',   10100, 10400, {'id': 133, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
-    overlapView.addItem(new Item('134',   10000, 10040, {'id': 134, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
-    overlapView.addItem(new Item('135',   10001, 10002, {'id': 135, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
-    overlapView.addItem(new Item('136', 10001, 10002, {'id': 136, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
-    overlapView.addItem(new Item('137', 10002, 10003, {'id': 137, 'query': "SELECT r0_.id AS id0, r0_.title AS title1, r0_.url AS url2, r0_.status AS status3, r0_.log AS log4, r0_.created AS created5, r0_.updated AS updated6, r0_.rule_id AS rule_id7 FROM request r0_ WHERE r0_.status = 0"}));
-    overlapView.addItem(new Item('138', 10060, 10090, {'id': 136, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
-    overlapView.addItem(new Item('139', 10200, 10500, {'id': 136, 'query': "SELECT ip_addr FROM ip_addr ORDER BY created DESC LIMIT 1"}));
-    overlapView.setRenderRange(10000, 10060);
     
     overlapView.render();
 }
+
+function onFileDrop(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    var files = evt.dataTransfer.files;
+    var file = files[0];
+    
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        //DROPしたファイルの読み込み処理。
+        var jsonData = JSON.parse(e.target.result);
+        
+        overlapView.clearItems();
+        
+        for(n in jsonData) {
+            overlapView.addItem(new Item(jsonData[n].id, jsonData[n].from, jsonData[n].to, jsonData[n].extra));            
+        }
+        overlapView.setRenderRange(jsonData[0].from, jsonData[0].from + 120);
+        overlapView.render();
+    };
+    
+    reader.readAsText(file, 'utf-8');
+}
+
+function onDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy';
+}
+
     </script>
+    
+    <style>
+        #file-upload {
+            height: 100px;
+            border: 1px dashed #ccc;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            vertical-align: middle;
+            color: #ccc;
+            font-weight: bold;
+            display:table-cell;
+        }
+        #file-upload p {
+            font-size: 3.0em;
+            line-height: 2.5;
+            display: inline-block;
+        }
+        
+        #file-upload:hover {
+            background-color: #ffe;
+            color: #CCC9AD;
+            font-size: 1.05em;
+        }
+        
+    </style>
     
 </head>
 
@@ -47,11 +109,14 @@ function initialize() {
     
     <div class="container">
     
-        <br>
-        <br>
-        <br>
+        <div class="row">
+            <div class="span12" id="file-upload">
+                <p>DROP FILE HERE...</p>
+            </div>
+        </div>
+    
         <div>
-            <canvas id="canvas" width="980" height="250">Canvasに対応したブラウザが必要です。</canvas>
+            <canvas id="canvas" width="1170" height="500">Canvasに対応したブラウザが必要です。</canvas>
         </div>
         
         <table class="table table-bordered table-striped table-condenced">
@@ -66,6 +131,10 @@ function initialize() {
             <tr>
                 <th>END:</th>
                 <td id="end-time">---</td>
+            </tr>
+            <tr>
+                <th>Connection:</th>
+                <td id="connection">---</td>
             </tr>
             <tr>
                 <th>QUERIES:</th>

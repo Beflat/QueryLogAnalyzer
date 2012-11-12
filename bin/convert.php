@@ -27,11 +27,6 @@ try {
             throw new UnexpectedValueException('typeの指定が実装されていない、または無効です。: ' . $parsedParams->args['type']);
     }
     
-    echo "options:\n";
-    var_export($parsedParams->options);
-    echo "args:\n";
-    var_export($parsedParams->args);
-    
 } catch(Exception $e) {
     echo "\n---------------------------------------------------\n";
     echo "Error: \n";

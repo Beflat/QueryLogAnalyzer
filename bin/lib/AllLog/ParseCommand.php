@@ -44,7 +44,9 @@ class AllLog_ParseCommand {
         
             foreach($this->files as $file) {
                 //解析の実行。
-                $parser = new AllLog_Parser($file, $options['from'], $options['to']);
+                $from = ($options['from'] != '') ? strtotime($options['from']) : 0;
+                $to = ($options['to']   != '') ? strtotime($options['to'])   : 0;
+                $parser = new AllLog_Parser($file, $from, $to);
                 $parser->parse();
                 $parseResult = array_merge($parseResult, $parser->getResult());
             }
@@ -78,10 +80,10 @@ class AllLog_ParseCommand {
         
         //TODO:各入力フォーマット共通
         if(!isset($options['from'])) {
-            $options['from'] = 0;
+            $options['from'] = '';
         }
         if(!isset($options['to'])) {
-            $options['to'] = 0;
+            $options['to'] = '';
         }
         if(!isset($options['format'])) {
             $options['format'] = 'json';
