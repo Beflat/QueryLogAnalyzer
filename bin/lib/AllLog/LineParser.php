@@ -31,11 +31,12 @@ class AllLog_LineParser {
      */
     public function isAllLogLine($line) {
         //日付を含むAllLogの行データか
-        if(preg_match('#^[0-9]+ [\s0-9:]+?\t\s+[0-9]+\s[\w\s]+?\t+#', $line)) {
+//        if(preg_match('#^[0-9]+ [\s0-9:]+?\s+[0-9]+\s[\w ]+?\t#', $line)) {
+        if(preg_match('#^[0-9]+\s+[0-9:]+\s*[0-9]+\s[\w ]+\t#', $line)) {
             return true;
         }
         //日付を含まないAllLogの行データか
-        if(preg_match('#^\t\t\s+\d+\s[\w\s]+\t#', $line)) {
+        if(preg_match('#^\t\t\s*[0-9]+\s[\w ]+\t#', $line)) {
             return true;
         }
         return false;
@@ -59,11 +60,11 @@ class AllLog_LineParser {
         $line = $fileReader->getLine();
         $result = array();
         //時刻を含む構文でマッチするか確認する。
-        if(!preg_match('#^(?<time>[0-9]+ [\s0-9:]+?)\t\s+(?<id>[0-9]+)\s(?<command>[\w\s]+?)\t(?<args>.*)$#', $line, $result)) {
+        if(!preg_match('#^(?<time>[0-9]+\s+[0-9:]+)\s*(?<id>[0-9]+)\s(?<command>[\w ]+)\t(?<args>.*)$#', $line, $result)) {
             //上の構文でマッチしない場合、時刻なしバージョンでマッチするか確認する。
-            if(!preg_match('#\t\t\s+(?<id>\d+) (?<command>[\w\s]+?)\t(?<args>.*)$#', $line, $result)) {
+            if(!preg_match('#^\t\t\s*(?<id>\[0-9]+)\s(?<command>[\w ]+)\t(?<args>.*)$#', $line, $result)) {
                 //これでもマッチしない場合はエラー
-                throw new UnexpectedValueException('無効なフォーマットです。Line:' . $fileReader->getLineNo());
+                throw new UnexpectedValueException('無効なフォーマットです。Line:' . $fileReader->getLineNo()."\n" . $fileReader->getLine());
             }
         }
         
@@ -79,14 +80,17 @@ class AllLog_LineParser {
         //複数行クエリへの対応
         //非常に長いクエリの可能性もあるのでとりあえず10行まで
         $lineCount = 0;
-        while(!$fileReader->isEof() && $lineCount < 10) {
+        while(!$fileReader->isEof()) {
             //次の行を試しに調べる(カーソルは進めない)。
             $try = $fileReader->tryLine();
             if($this->isAllLogLine($try)) {
                 //次の行がAllLogとして有効な行であった場合はそこまでで解析を中止する。
                 return $result;
             }
-            $result['args'] .= "\n" . $fileReader->getLine();
+            $append = $fileReader->getLine();
+            if($lineCount < 10) {
+                $result['args'] .= "\n" . $append;
+            }
             $lineCount++;
         }
         return $result;

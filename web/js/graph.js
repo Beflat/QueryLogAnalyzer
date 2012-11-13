@@ -207,6 +207,8 @@ OverlapView.prototype = {
 	 * ホイール操作時のイベントハンドラ
 	 */
 	_onWheel: function(e) {
+		e.stopPropagation();
+		e.preventDefault();
 		var d = 0;
 		if(e.wheelDelta) {
 			//chrome
@@ -313,6 +315,26 @@ RenderingContext.prototype = {
 		}
 		return overlapped;
 	},
+	
+	/**
+	 * 指定されたItemを描画する際のY座標を決定して返す。
+	 * 他のItemと重ならないY座標を探す。
+	 */
+	getRenderY: function(item, fromY) {
+		var y = fromY;
+		var i = 0;
+		for(i in this.items) {
+			if(this.items[i] === item) {
+				continue;
+			}
+			//他のItemと重ならない座標を見つけるまで10ドットずつ下がりながら探す。
+			if(this.items[i].isOverlappedWithPosition(item.startTime, item.endTime, y)) {
+				y = this.getRenderY(item, y + 10);
+				break;
+			}
+		}
+		return y;
+	},
 }
 
 
@@ -327,7 +349,10 @@ Item.prototype = {
 	//定数
 	STATE_NORMAL: 0,
 	STATE_MOUSE_HOVER: 1,
-		
+	
+	//TODO: 描画関連の処理や定数は、いずれCanvasか別のクラスへ移植する
+	MARGIN_Y: 10,  //Itemを描画する際、
+	
 	id: '',
 	startTime: 0,
 	endTime: 0,
@@ -373,7 +398,7 @@ Item.prototype = {
 		var endX       = (relativeEndPos   / timeLength) * canvasSize;
 		
 		if(this._renderY == -1) {
-			this._renderY = 10 + renderingContext.getOverlappedCount(this) * 10;
+			this._renderY = renderingContext.getRenderY(this, -1);
 		}
 		
 		//クリッピング
@@ -399,8 +424,8 @@ Item.prototype = {
 			context.lineWidth = 4;
 			offsetY = -1;
 		}
-		context.moveTo(renderingContext.baseX + startX, renderingContext.baseY + this._renderY + offsetY);
-		context.lineTo(renderingContext.baseX + endX,   renderingContext.baseY + this._renderY + offsetY);
+		context.moveTo(renderingContext.baseX + startX, renderingContext.baseY + this._renderY + offsetY + this.MARGIN_Y);
+		context.lineTo(renderingContext.baseX + endX-3,   renderingContext.baseY + this._renderY + offsetY + this.MARGIN_Y);
 		context.stroke();
 		
 		context.restore();
@@ -454,15 +479,33 @@ Item.prototype = {
 	 * このオブジェクトが指定されたItemと時間的に重なっているかを返す。
 	 */
 	isOverlapped: function(from, to) {
-		if(this.startTime >= from && this.startTime <= to) {
+		if(this.startTime >= from && this.startTime < to) {
 			return true;
 		}
-		if(this.endTime >= from && this.startTime <= to) {
+		if(this.endTime > from && this.startTime < to) {
 			return true;
 		}
+		
+		if(this.startTime < from && this.endTime > from) {
+		    return true;
+		}
+		
 		return false;
 	},
 	
+    /**
+     * このオブジェクトが指定されたItemと時間、Y座標で重なっているかを返す。
+     */
+    isOverlappedWithPosition: function(from, to, y) {
+        
+        if(!this.isOverlapped(from, to)) {
+            return false;
+        }
+        
+        //今は==での完全一致で判定できないので、大まかに差が5以内であれば重なっているものとして判断する。
+        return (Math.abs((this._renderY) - y) < 5);
+    },
+    
 	/**
 	 * @param int time マウス位置の時間(単位：秒)
 	 * @param int mouseY マウスのY座標。Canvasからグラフ領域までのオフセットは減算済。
@@ -470,11 +513,19 @@ Item.prototype = {
 	onMouseMove: function(time, mouseY) {
 		var newState = this.state;
 		
-		if(!this.isOverlapped(time, time)) {
-			//マウスがX軸で重なっていない。
-			newState = this.STATE_NORMAL;
-		} else if(this._renderY != -1 && Math.abs(mouseY - this._renderY) <= 3) {
-			//Y座標の差が3以内ならカーソルが触れていると判断する。
+//		if(!this.isOverlapped(time, time)) {
+//			//マウスがX軸で重なっていない。
+//			newState = this.STATE_NORMAL;
+//		} else if(this._renderY != -1 && Math.abs(mouseY - this._renderY) <= 3) {
+//			//Y座標の差が3以内ならカーソルが触れていると判断する。
+//			newState = this.STATE_MOUSE_HOVER;
+//		} else {
+//			newState = this.STATE_NORMAL;
+//		}
+		
+		//Itemを描画する時にMARGIN_Yだけ座標が補正されているのでマウスの座標をMARGIN_Yだけずらす。
+		//本来は
+		if(this.isOverlappedWithPosition(time, time, mouseY - this.MARGIN_Y)) {
 			newState = this.STATE_MOUSE_HOVER;
 		} else {
 			newState = this.STATE_NORMAL;
@@ -501,6 +552,11 @@ Item.prototype = {
 	 */
 	detach: function() {
 		this.onSelect = null;
+	},
+	
+	
+	detectRenderY: function() {
+	    
 	},
 	
 	/**

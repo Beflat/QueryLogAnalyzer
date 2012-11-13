@@ -41,7 +41,7 @@ class AllLog_Parser {
         $lineParser->skipHeader($this->fileReader);
         
         $currentTime = 0;
-        
+        $this->results = array();
         while(!$this->fileReader->isEof()) {
             $parsedLine = $lineParser->parseLine($this->fileReader);
             if(isset($parsedLine['time'])) {

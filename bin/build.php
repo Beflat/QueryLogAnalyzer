@@ -3,7 +3,7 @@
 $pharPath = 'package.phar';
 $extractPath = './extract';
 $files = array(
-    'convert.php',
+    'index.php',
     'config.php',
     'lib',
 );
@@ -11,7 +11,7 @@ $bootstrap = 'convert.php';
 
 try {
 
-    $phar = new Phar($pharPath, 0, basename($pharPath));
+    $phar = new Phar($pharPath, 0, $pharPath);
     $phar->setMetadata('bootstrap', $bootstrap);
 
     if($argv[1] == '-d') {
