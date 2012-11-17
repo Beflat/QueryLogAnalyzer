@@ -62,7 +62,7 @@ class AllLog_LineParser {
         //時刻を含む構文でマッチするか確認する。
         if(!preg_match('#^(?<time>[0-9]+\s+[0-9:]+)\s*(?<id>[0-9]+)\s(?<command>[\w ]+)\t(?<args>.*)$#', $line, $result)) {
             //上の構文でマッチしない場合、時刻なしバージョンでマッチするか確認する。
-            if(!preg_match('#^\t\t\s*(?<id>\[0-9]+)\s(?<command>[\w ]+)\t(?<args>.*)$#', $line, $result)) {
+            if(!preg_match('#^\t\t\s*(?<id>[0-9]+)\s(?<command>[\w ]+)\t(?<args>.*)$#', $line, $result)) {
                 //これでもマッチしない場合はエラー
                 throw new UnexpectedValueException('無効なフォーマットです。Line:' . $fileReader->getLineNo()."\n" . $fileReader->getLine());
             }
