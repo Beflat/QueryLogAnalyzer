@@ -28,6 +28,7 @@ OverlapView.prototype = {
 	renderTo: 0,
 	items: [],
 	state: 0,
+	currentOverlap: 0,
 	
 	//プライベートメンバ
 	_prevMouseX: 0,
@@ -55,6 +56,7 @@ OverlapView.prototype = {
 		this.renderFrom = 0;
 		this.renderTo = 0;
 		this.items = [];
+		this.currentOverlap = 0;
 		
 		this._prevMouseX = 0;
 	},
@@ -512,16 +514,6 @@ Item.prototype = {
 	 */
 	onMouseMove: function(time, mouseY) {
 		var newState = this.state;
-		
-//		if(!this.isOverlapped(time, time)) {
-//			//マウスがX軸で重なっていない。
-//			newState = this.STATE_NORMAL;
-//		} else if(this._renderY != -1 && Math.abs(mouseY - this._renderY) <= 3) {
-//			//Y座標の差が3以内ならカーソルが触れていると判断する。
-//			newState = this.STATE_MOUSE_HOVER;
-//		} else {
-//			newState = this.STATE_NORMAL;
-//		}
 		
 		//Itemを描画する時にMARGIN_Yだけ座標が補正されているのでマウスの座標をMARGIN_Yだけずらす。
 		//本来は

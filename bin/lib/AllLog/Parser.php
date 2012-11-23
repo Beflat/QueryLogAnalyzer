@@ -59,13 +59,13 @@ class AllLog_Parser {
             if(!isset($this->results[$sessionId])) {
                 $this->results[$sessionId] = new LogicalEntry($sessionId);
                 $this->results[$sessionId]->setFrom($currentTime);
-                $this->results[$sessionId]->setSortKey($currentTime . '_' . $sessionId);
             }
             
             $this->results[$sessionId]->setExtra($parsedLine['command'], $parsedLine['args']);
             if($parsedLine['command'] == 'Quit') {
                 //コネクションの終了時刻を記録する。
                 $this->results[$sessionId]->setTo($currentTime);
+                $this->results[$sessionId]->setElapsed($currentTime - $this->results[$sessionId]->getFrom());
             }
         }
         
@@ -76,6 +76,7 @@ class AllLog_Parser {
                 continue;
             }
             $this->results[$id]->setTo($currentTime);
+            $this->results[$sessionId]->setElapsed($currentTime - $this->results[$id]->getFrom());
         }
     }
     

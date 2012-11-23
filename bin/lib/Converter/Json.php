@@ -29,10 +29,11 @@ class Converter_Json implements Converter_Interface {
         foreach($entries as $idx=>$entry) {
             $first = false;
             $data = array(
-                'id'    => $entry->getId(),
-                'from'  => $entry->getFrom(),
-                'to'    => $entry->getTo(),
-                'extra' => $entry->getAllExtra(),
+                'id'      => $entry->getId(),
+                'from'    => $entry->getFrom(),
+                'to'      => $entry->getTo(),
+                'elapsed' => $entry->getElapsed(),
+                'extra'   => $entry->getAllExtra(),
             );
             $tail = ($idx == $lastEntryIndex) ? "\n" : ",\n";
             fputs($fp, json_encode($data) . $tail);

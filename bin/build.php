@@ -12,7 +12,7 @@ $bootstrap = 'convert.php';
 try {
 
     $phar = new Phar($pharPath, 0, $pharPath);
-    $phar->setMetadata('bootstrap', $bootstrap);
+//    $phar->setMetadata('bootstrap', $bootstrap);
 
     if($argv[1] == '-d') {
 

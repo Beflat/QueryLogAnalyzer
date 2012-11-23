@@ -26,6 +26,12 @@ class LogicalEntry {
     protected $to;
     
     /**
+     * 経過時間(単位は秒やマイクロ秒など、利用方法により異なる)
+     * @param float
+     */
+    protected $elapsed;
+    
+    /**
      * 利用用途毎に格納されるオプションのデータ
      * @param array
      */
@@ -42,6 +48,7 @@ class LogicalEntry {
         $this->id = $id;
         $this->from = 0;
         $this->to = 0;
+        $this->elapsed = 0;
         $this->extraData = array();
         $this->sortKey = '';
     }
@@ -53,6 +60,10 @@ class LogicalEntry {
     
     public function setTo($to) {
         $this->to = $to;
+    }
+    
+    public function setElapsed($elapsed) {
+        $this->elapsed = $elapsed;
     }
     
     public function setExtra($key, $value) {
@@ -68,9 +79,10 @@ class LogicalEntry {
         $this->extraData[$key] = $value;
     }
     
-    public function setSortKey($key) {
-        $this->sortKey = $key;
+    public function initExtraWithArray($newArray) {
+        $this->extraData = $newArray;
     }
+    
     
     
     public function getId() {
@@ -86,6 +98,9 @@ class LogicalEntry {
         return $this->to;
     }
     
+    public function getElapsed() {
+        return $this->elapsed;
+    }
     
     public function getAllExtra() {
         return $this->extraData;
@@ -99,8 +114,5 @@ class LogicalEntry {
     }
     
     
-    public function getSortKey() {
-        return $this->sortKey;
-    }
 }
 

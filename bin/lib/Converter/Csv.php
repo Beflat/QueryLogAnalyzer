@@ -45,6 +45,7 @@ class Converter_Csv implements Converter_Interface {
                 $entry->getId(),
                 $entry->getFrom(),
                 $entry->getTo(),
+                $entry->getElapsed(),
             );
             
             $extra = $entry->getAllExtra();
