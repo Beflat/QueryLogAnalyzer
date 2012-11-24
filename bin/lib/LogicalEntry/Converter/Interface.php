@@ -4,7 +4,7 @@
 /**
  * Converterのインターフェース
  */
-interface Converter_Interface {
+interface LogicalEntry_Converter_Interface {
     
     public function convert($entries);
     

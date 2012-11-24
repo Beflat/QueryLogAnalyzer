@@ -1,17 +1,21 @@
 <?php
 
 
-
-class AllLog_ParseCommand {
+/**
+ * AllLogの内容をLogicalEntryへ変換するためのクラス。
+ */
+class AllLog_Normalizer {
     
     protected $options;
     
     protected $files;
     
+    protected $result;
     
     public function __construct($files, $options) {
         $this->files = $files;
         $this->options = $options;
+        $this->result = array();
     }
     
     /**
@@ -26,50 +30,33 @@ class AllLog_ParseCommand {
             throw new InvalidArgumentException('パラメータ"to"の日付の書式が無効です。: ' . $this->options['to']);
         }
         
-        if(isset($this->options['format']) && !in_array($this->options['format'], array('csv', 'json'))) {
-            throw new InvalidArgumentException('パラメータ"format"の値が無効です。: ' . $this->options['format']);
-        }
-        
         if(!is_array($this->files) || count($this->files) == 0) {
             throw new InvalidArgumentException('ファイルが指定されていません。');
         }
     }
     
-    public function run() {
+    public function normalize() {
         
         $options = $this->getCleanedOptions($this->options);
         
-        $parseResult = array();
-        try {
-        
-            foreach($this->files as $file) {
-                //解析の実行。
-                $from = ($options['from'] != '') ? strtotime($options['from']) : 0;
-                $to = ($options['to']   != '') ? strtotime($options['to'])   : 0;
-                $parser = new AllLog_Parser($file, $from, $to);
-                $parser->parse();
-                $parseResult = array_merge($parseResult, $parser->getResult());
-            }
-            
-            //全ファイルの解析結果をマージした状態のデータをソートする
-            uasort($parseResult, array($this, 'sortResultsCallback'));
-            
-            //ソートした結果を指定されたフォーマットで出力する。
-            if($options['format'] == 'csv') {
-                $converter = new Converter_Csv($options['output']);
-            } else if($options['format'] == 'json') {
-                $converter = new Converter_Json($options['output']);
-            }
-            $converter->convert($parseResult);
-            
-        } catch(Exception $e) {
-            echo "Error:\n";
-            echo $e->getMessage()."\n";
-            echo "\n\n";
+        foreach($this->files as $file) {
+            //解析の実行。
+            $from = ($options['from'] != '') ? strtotime($options['from']) : 0;
+            $to = ($options['to']   != '') ? strtotime($options['to'])   : 0;
+            $parser = new AllLog_Parser($file, $from, $to);
+            $parser->parse();
+            $this->result = array_merge($this->result, $parser->getResult());
         }
         
+        //全ファイルの解析結果をマージし、"[開始時間]_[セッションID]"の昇順でソートする。
+        //(これにより、複数のファイルのログを結合した結果が時系列順でソートされる)
+        uasort($this->result, array($this, 'sortResultsCallback'));
     }
     
+    
+    public function getResult() {
+        return $this->result;
+    }
     
     /**
      * オプションの各値を必要に応じてデフォルト値などで初期化して返す。
@@ -85,10 +72,6 @@ class AllLog_ParseCommand {
         if(!isset($options['to'])) {
             $options['to'] = '';
         }
-        if(!isset($options['format'])) {
-            $options['format'] = 'json';
-        }
-        
         if(!isset($options['output'])) {
             $options['output'] = 'php://output';
         }

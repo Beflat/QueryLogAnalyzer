@@ -1,6 +1,6 @@
 <?php
 
-class Converter_Csv implements Converter_Interface {
+class LogicalEntry_Converter_Csv implements LogicalEntry_Converter_Interface {
     
     /**
      * 

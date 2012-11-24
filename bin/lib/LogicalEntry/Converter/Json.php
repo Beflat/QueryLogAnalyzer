@@ -1,6 +1,6 @@
 <?php
 
-class Converter_Json implements Converter_Interface {
+class LogicalEntry_Converter_Json implements LogicalEntry_Converter_Interface {
     
     /**
      * 
