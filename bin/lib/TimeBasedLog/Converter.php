@@ -1,7 +1,7 @@
 <?php
 
 
-class Stat_Command {
+class TimeBasedLog_Converter {
     protected $options;
     
     protected $file;
@@ -16,7 +16,6 @@ class Stat_Command {
      * 入力パラメータの妥当性をチェックする。
      */
     public function validateParams() {
-        //TODO:時間や出力形式のオプションは他の入力フォーマットの場合も共通。
         if(isset($this->options['format']) && !in_array($this->options['format'], array('csv', 'json'))) {
             throw new InvalidArgumentException('パラメータ"format"の値が無効です。: ' . $this->options['format']);
         }
@@ -26,35 +25,27 @@ class Stat_Command {
         }
     }
     
-    public function run() {
+    public function convert() {
         
         $options = $this->getCleanedOptions($this->options);
         
         $result = array();
-        try {
-            
-            $reader = new LogicalEntry_Reader($this->file);
-            $generator = new Stat_TimeBasedStatGenerator();
-            
-            $generator->init($options['threshold']);
-            while(!$reader->isEof()) {
-                $entry = $reader->getEntry();
-                $generator->addEntry($entry);
-            }
-            
-            $result = $generator->getScaledResult($options['scale'], $options['scale_mode']);
-            $convertedResult = $this->convertResult($result, $options['format']);
-            
-            if(!file_put_contents($options['output'], $convertedResult)) {
-                throw new RuntimeException('ファイルの保存に失敗しました。: ' . $options['output']);
-            }
-            
-        } catch(Exception $e) {
-            echo "Error:\n";
-            echo $e->getMessage()."\n";
-            echo "\n\n";
+        $reader = new LogicalEntry_Reader($this->file);
+        $builder = new TimeBasedLog_Builder();
+        
+        $builder->init($options['threshold']);
+        while(!$reader->isEof()) {
+            $entry = $reader->getEntry();
+            $builder->addEntry($entry);
         }
         
+        //TODO: 保存関連の処理はこのクラスの外へ処理を移動する
+        $result = $builder->getScaledResult($options['scale'], $options['scale_mode']);
+        $convertedResult = $this->convertResult($result, $options['format']);
+        
+        if(!file_put_contents($options['output'], $convertedResult)) {
+            throw new RuntimeException('ファイルの保存に失敗しました。: ' . $options['output']);
+        }
     }
     
     
@@ -105,7 +96,7 @@ class Stat_Command {
             $options['scale'] = 1;
         }
         if(!isset($options['scale_mode'])) {
-            $options['scale_mode'] = Stat_TimeBasedStatGenerator::SCALE_MODE_MAX;
+            $options['scale_mode'] = TimeBasedLog_Builder::SCALE_MODE_MAX;
         }
         
         return $options;

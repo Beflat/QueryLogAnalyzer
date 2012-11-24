@@ -21,9 +21,9 @@ try {
     $parsedParams = $parser->parse();
     
     
-    $command = new Stat_Command($parsedParams->args['file'], $parsedParams->options);
-    $command->validateParams();
-    $command->run();
+    $converter = new TimeBasedLog_Converter($parsedParams->args['file'], $parsedParams->options);
+    $converter->validateParams();
+    $converter->convert();
     
 } catch(Exception $e) {
     echo "Error: \n";

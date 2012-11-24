@@ -3,7 +3,7 @@
 
 
 
-class Stat_TimeBasedStatGenerator {
+class TimeBasedLog_Builder {
     
     private $result;
     

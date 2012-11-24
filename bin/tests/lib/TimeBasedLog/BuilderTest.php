@@ -1,7 +1,7 @@
 <?php
 
 
-class TimeBasedStatGeneratorTest extends PHPUnit_Framework_TestCase {
+class TimeBasedLog_BuilderTest extends PHPUnit_Framework_TestCase {
 
     public function testStatGeneration() {
         
@@ -13,7 +13,7 @@ class TimeBasedStatGeneratorTest extends PHPUnit_Framework_TestCase {
         $entry2->setFrom(5);
         $entry2->setTo(8);
         
-        $statGenerator = new Stat_TimeBasedStatGenerator();
+        $statGenerator = new TimeBasedLog_Builder();
         $statGenerator->addEntry($entry1);
         $statGenerator->addEntry($entry2);
         $result = $statGenerator->getResult();
@@ -36,7 +36,7 @@ class TimeBasedStatGeneratorTest extends PHPUnit_Framework_TestCase {
         $entry2->setFrom(8);
         $entry2->setTo(20);
         
-        $statGenerator = new Stat_TimeBasedStatGenerator();
+        $statGenerator = new TimeBasedLog_Builder();
         $statGenerator->addEntry($entry1);
         $statGenerator->addEntry($entry2);
         $result = $statGenerator->getResult();
@@ -69,7 +69,7 @@ class TimeBasedStatGeneratorTest extends PHPUnit_Framework_TestCase {
         $entry3->setElapsed(0);
         
         
-        $statGenerator = new Stat_TimeBasedStatGenerator();
+        $statGenerator = new TimeBasedLog_Builder();
         $statGenerator->init(1);
         $statGenerator->addEntry($entry1);
         $statGenerator->addEntry($entry2);
@@ -99,7 +99,7 @@ class TimeBasedStatGeneratorTest extends PHPUnit_Framework_TestCase {
         $entry2->setTo(10);
         $entry2->setExtra('Query', 'UPDATE AAA SET bbb=1');
         
-        $statGenerator = new Stat_TimeBasedStatGenerator();
+        $statGenerator = new TimeBasedLog_Builder();
         $statGenerator->init();
         $statGenerator->registerCallback(array($this, 'sampleCallback'));
         $statGenerator->addEntry($entry1);
@@ -155,7 +155,7 @@ class TimeBasedStatGeneratorTest extends PHPUnit_Framework_TestCase {
         $entry4->setFrom(61);
         $entry4->setTo(70);
         
-        $statGenerator = new Stat_TimeBasedStatGenerator();
+        $statGenerator = new TimeBasedLog_Builder();
         $statGenerator->init();
         $statGenerator->addEntry($entry1);
         $statGenerator->addEntry($entry2);
