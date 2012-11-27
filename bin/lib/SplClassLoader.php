@@ -31,8 +31,8 @@ class SplClassLoader {
         if(!is_file($filePath)) {
             return;
         }
-        
         require $filePath;
     }
     
 }
+
