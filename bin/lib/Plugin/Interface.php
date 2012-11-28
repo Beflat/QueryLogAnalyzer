@@ -17,10 +17,4 @@ interface Plugin_Interface {
      */
     public function getType();
     
-    /**
-     * このプラグインがどの拡張ポイントでどの処理を実行するかの情報を返す。
-     * @return array 拡張ポイントとコールバック関数の対応付けを定義した連想配列
-     */
-    public function getExtensionPoints();
-    
 }

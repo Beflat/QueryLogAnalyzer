@@ -14,18 +14,22 @@ $parser->addOption('to',   array('long_name' => '--to',   'action' => 'StoreStri
 
 
 try {
+    
+    $pluginManager = new Plugin_Manager();
+    $pluginManager->loadPlugins(PLUGIN_DIR);
+    
+    //サブコマンドの一覧を作成する。
+    $plugins = $pluginManager->getPluginsByType(Normalizer_Plugin::TYPE);
+    foreach($plugins as $name=>$plugin) {
+        $definition = $plugin->getCommandDefinition();
+        $parser->addCommand($definition['name']);
+    }
+    
     $parsedParams = $parser->parse();
     
-    
-    switch($parsedParams->args['type']) {
-        case 'all':
-            $normalizer = new AllLog_Normalizer($parsedParams->args['files'], $parsedParams->options);
-            $normalizer->validateParams();
-            $normalizer->normalize();
-            break;
-        default:
-            throw new UnexpectedValueException('typeの指定が実装されていない、または無効です。: ' . $parsedParams->args['type']);
-    }
+    $plugin = Normalizer_Plugin::getPluginByCommandName($plugins, $parsedParams->command_name);
+    $plugin->validateParams();
+    $plugin->normalize();
     
     //ソートした結果を指定されたフォーマットで出力する。
     $format = isset($parsedParams->options['format']) ? $parsedParams->options['format'] : 'json';

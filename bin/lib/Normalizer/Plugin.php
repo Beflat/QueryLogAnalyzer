@@ -31,16 +31,36 @@ abstract class Normalizer_Plugin implements Plugin_Interface {
      * プラグインの種類を返す。
      * @return string
      */
-    public function getType() {
+    public final function getType() {
         return self::TYPE;
     }
+    
+    
+    public function getCommandName() {
+        $definition = $this->getCommandDefinition();
+        return $definition['name'];
+    }
+    
+    /**
+     * サブコマンドとして登録するためのオブジェクトを返す。
+     * オプションや説明などの情報を含んでいる。
+     * @return array Console_CommandLineのサブコマンドを定義するための情報を含んだ配列。次のフォーマットに従う。
+     * 
+     * array(
+     *     'name' => 'サブコマンド名',
+     *     'options' => array('オプション名。addOptionの第1引数' => array([addOptionに渡すパラメータ情報])),
+     *     'arguments' => array('引数名。addArgumentの第2引数' => array([addArgumentに渡すパラメータ情報])),
+     * );
+     */
+    abstract function getCommandDefinition();
+    
     
     /**
      * プラグインの初期化を行う。
      * @param  array $options オプション情報を含んだ配列
      */
     public function initPlugin($options) {
-        
+        $this->options;
     }
     
     
@@ -51,13 +71,6 @@ abstract class Normalizer_Plugin implements Plugin_Interface {
      */
     public function validateParams() {
     }
-    
-    
-    /**
-     * コマンドラインからこのプラグインを指定するための名前を返す(半角英数で指定)。
-     * @return string
-     */
-    abstract function getNormalizerName();
     
     
     /**
@@ -75,14 +88,12 @@ abstract class Normalizer_Plugin implements Plugin_Interface {
     abstract public function getResult();
     
     
-    /**
-     * このプラグインがどの拡張ポイントでどの処理を実行するかの情報を返す。
-     * @return array 拡張ポイントとコールバック関数の対応付けを定義した連想配列
-     */
-    public function getExtensionPoints() {
-        return array();
+    public static function getPluginByCommandName($plugins, $commandName) {
+        foreach($plugins as $idx=>$plugin) {
+            if($plugin->getCommandName() == $commandName) {
+                return $pluginx[$idx];
+            }
+        }
+        throw new RuntimeException('無効なコマンド名です。: ' . $commandName);
     }
-
-    
-    
 }

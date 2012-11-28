@@ -14,3 +14,5 @@ $generalClassLoader->register();
 
 //定数
 define('VERSION', 0.1);
+
+define('PLUGIN_DIR', dirname(__FILE__) . '/plugins.cfg');

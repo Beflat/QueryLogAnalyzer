@@ -30,37 +30,36 @@ class Plugin_Manager {
         $this->plugins = array();
     }
     
-    public function loadPlugins($dir) {
-        if(!is_dir($dir)) {
-            throw new RuntimeExtension('ディレクトリが存在しません。: ' . $dir);
+    
+    /**
+     * 指定されたファイルをプラグインの設定ファイルとみなして解析する。
+     * プラグインディレクトリは外部でAutoLoadの設定が行われている前提。
+     * @param  string $configFile プラグイン設定ファイル。プラグインクラス名を列挙したフもの。
+     * @throws RuntimeException
+     */
+    public function loadPlugins($configFile) {
+        if(!is_file($configFile)) {
+            throw new RuntimeExtension('設定ファイルが存在しません。: ' . $configFile);
         }
-        foreach(new RecursiveIteratorIterator( new RecursiveDirectoryIterator($dir)) as $entry) {
-            if(basename($entry) != 'plugin.json') {
+        
+        $fp = fopen($configFile, 'r');
+        if(!$fp) {
+            throw new RuntimeException('設定ファイルの読み込みに失敗しました。: ' . $configFile);
+        }
+        
+        while(!feof($fp)) {
+            $line = rtrim(fgets($fp, 4196), "\r\n");
+            if($line[0] == '#') {
+                //先頭が#の場合はコメントと見て読み飛ばす。
                 continue;
             }
-            $contents = file_get_contents($entry);
-            if(!$contents) {
-                throw new RuntimeException('プラグイン定義情報の取得に失敗しました。: ' . $entry);
-            }
-            $jsonData = json_decode($contents, true);
-            if(!$jsonData) {
-                throw new RuntimeException('プラグイン定義情報の解析に失敗しました。: ' . $entry);
-            }
-            if(!isset($jsonData['entry_class'])) {
-                throw new RuntimeException('定義情報に"entry_class"の定義が存在しません。: ' . $entry);
-            }
-            $entryClassName = $json['entry_class'];
+            //設定ファイルの内容はクラス名とみなす。
             if(!class_exists($entryClassName)) {
                 throw new RuntimeException('プラグインのクラス"' . $entryClassName . 'は存在しません。": ' . $entry);
             }
             
-            $plugin = new $entryClassName();
+            $plugin = new $line();
             $this->addPlugin($plugin);
-            
-            // $extensionPointMap = $plugin->getExtensionPoints();
-            // foreach((array)$extensionPointMap as $extensionPoint=>$callback) {
-            //     $this->addExtensionPoint($name, $plugin->getName(), $callback);
-            // }
         }
     }
     
