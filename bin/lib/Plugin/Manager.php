@@ -53,9 +53,12 @@ class Plugin_Manager {
                 //先頭が#の場合はコメントと見て読み飛ばす。
                 continue;
             }
+            if(strlen($line) == 0) {
+                continue;
+            }
             //設定ファイルの内容はクラス名とみなす。
-            if(!class_exists($entryClassName)) {
-                throw new RuntimeException('プラグインのクラス"' . $entryClassName . 'は存在しません。": ' . $entry);
+            if(!class_exists($line)) {
+                throw new RuntimeException('プラグインのクラス"' . $line . '"は存在しません。');
             }
             
             $plugin = new $line();

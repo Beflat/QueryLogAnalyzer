@@ -11,8 +11,11 @@ $pearClassLoader->registerAsPear();
 $generalClassLoader = new SplClassLoader(dirname(__FILE__) . '/lib');
 $generalClassLoader->register();
 
+$pluginClassLoader = new SplClassLoader(dirname(__FILE__) . '/plugins');
+$pluginClassLoader->register();
+
 
 //定数
 define('VERSION', 0.1);
 
-define('PLUGIN_DIR', dirname(__FILE__) . '/plugins.cfg');
+define('PLUGIN_CONFIG_FILE', dirname(__FILE__) . '/plugins.cfg');

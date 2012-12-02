@@ -8,6 +8,32 @@
 interface Normalizer_Plugin_Interface extends Plugin_Interface {
     
     /**
+     * プラグイン名を返す。
+     * @return string
+     */
+    public function getName();
+    
+    
+    /**
+     * プラグインの種類を返す。
+     * @return string
+     */
+    public function getType();
+    
+    
+    public function getCommandName();
+    
+    /**
+     * コマンドラインパーサーの初期化時、プラグイン固有の処理を実行するために呼び出されるメソッド。
+     * @param  Console_CommandLine $parser コマンドラインパーサー。COnsole_CommandLineオブジェクト。
+     * @return void
+     * 
+     * パラメータや引数の追加などを行う。
+     */
+    public function onInitCommand(Console_CommandLine $parser);
+    
+    
+    /**
      * プラグインの初期化を行う。
      * @param  array $options オプション情報を含んだ配列
      */
@@ -23,13 +49,6 @@ interface Normalizer_Plugin_Interface extends Plugin_Interface {
     
     
     /**
-     * コマンドラインからこのプラグインを指定するための名前を返す(半角英数で指定)。
-     * @return string
-     */
-    public function getNormalizerName();
-    
-    
-    /**
      * 変換処理を実行する。
      * @param array $files 処理対象のファイル一覧
      * @return void
@@ -42,5 +61,4 @@ interface Normalizer_Plugin_Interface extends Plugin_Interface {
      * @return array 変換結果のLogicalEntryを含んだ配列
      */
     public function getResult();
-    
 }

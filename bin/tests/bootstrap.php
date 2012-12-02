@@ -8,3 +8,5 @@ $pearClassLoader->registerAsPear();
 $generalClassLoader = new SplClassLoader(dirname(__FILE__) . '/../lib');
 $generalClassLoader->register();
 
+$pluginClassLoader = new SplClassLoader(dirname(__FILE__) . '/../plugins');
+$pluginClassLoader->register();

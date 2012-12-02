@@ -2,9 +2,9 @@
 
 
 /**
- * ログ情報の正規化を行うプラグインの基底クラス
+ * ログ情報の正規化を行うプラグインの標準動作の一部を実装したクラス
  */
-abstract class Normalizer_Plugin implements Plugin_Interface {
+abstract class Normalizer_Plugin implements Normalizer_Plugin_Interface {
     
     const TYPE = 'Normalizer';
     
@@ -36,23 +36,18 @@ abstract class Normalizer_Plugin implements Plugin_Interface {
     }
     
     
-    public function getCommandName() {
-        $definition = $this->getCommandDefinition();
-        return $definition['name'];
-    }
+    abstract public function getCommandName();
     
     /**
-     * サブコマンドとして登録するためのオブジェクトを返す。
-     * オプションや説明などの情報を含んでいる。
-     * @return array Console_CommandLineのサブコマンドを定義するための情報を含んだ配列。次のフォーマットに従う。
+     * コマンドラインパーサーの初期化時、プラグイン固有の処理を実行するために呼び出されるメソッド。
+     * @param  Console_CommandLine $parser コマンドラインパーサー。COnsole_CommandLineオブジェクト。
+     * @return void
      * 
-     * array(
-     *     'name' => 'サブコマンド名',
-     *     'options' => array('オプション名。addOptionの第1引数' => array([addOptionに渡すパラメータ情報])),
-     *     'arguments' => array('引数名。addArgumentの第2引数' => array([addArgumentに渡すパラメータ情報])),
-     * );
+     * パラメータや引数の追加などを行う。
      */
-    abstract function getCommandDefinition();
+    public function onInitCommand(Console_CommandLine $parser) {
+        //デフォルトでは何もしない。
+    }
     
     
     /**
@@ -70,6 +65,7 @@ abstract class Normalizer_Plugin implements Plugin_Interface {
      * @throws InvalidArgumentException
      */
     public function validateParams() {
+        //デフォルトでは何もしない。
     }
     
     
@@ -86,14 +82,4 @@ abstract class Normalizer_Plugin implements Plugin_Interface {
      * @return array 変換結果のLogicalEntryを含んだ配列
      */
     abstract public function getResult();
-    
-    
-    public static function getPluginByCommandName($plugins, $commandName) {
-        foreach($plugins as $idx=>$plugin) {
-            if($plugin->getCommandName() == $commandName) {
-                return $pluginx[$idx];
-            }
-        }
-        throw new RuntimeException('無効なコマンド名です。: ' . $commandName);
-    }
 }

@@ -10,8 +10,8 @@ class AllLog_Normalizer extends Normalizer_Plugin {
     
     protected $result;
     
-    public function __construct($options) {
-        $this->options = $options;
+    public function __construct() {
+        $this->options = array();
         $this->result = array();
     }
     
@@ -19,21 +19,12 @@ class AllLog_Normalizer extends Normalizer_Plugin {
         return 'AllLog_Normalizer';
     }
     
-    public function initPlugin($options) {
-        super::initPlugin($options);
+    public function getCommandName() {
+        return 'all';
     }
     
-    public function getCommandDefinition() {
-        return array(
-            'name' => 'all',
-            'options' => array(
-                'output' => array('long_name' => '--output', 'action' => 'StoreString', 'description' => "出力ファイル名。 default=標準出力"),
-                'format' => array('long_name' => '--format', 'action' => 'StoreString', 'choices' => array('csv','json'), 'description' => "出力形式(csv,json)。default: json"),
-                'from'   => array('long_name' => '--from', 'action' => 'StoreString', 'description' => "解析の開始時刻(strtotimeが解析可能な書式)。"),
-                'to'     => array('long_name' => '--to',   'action' => 'StoreString', 'description' => "解析の終了時刻(strtotimeが解析可能な書式)。"),
-            ),
-            'arguments' => array(),
-        );
+    public function initPlugin($options) {
+        parent::initPlugin($options);
     }
     
     /**
@@ -86,10 +77,6 @@ class AllLog_Normalizer extends Normalizer_Plugin {
         if(!isset($options['to'])) {
             $options['to'] = '';
         }
-        if(!isset($options['output'])) {
-            $options['output'] = 'php://output';
-        }
-        
         return $options;
     }
     

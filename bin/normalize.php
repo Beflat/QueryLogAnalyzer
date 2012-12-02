@@ -2,34 +2,38 @@
 
 require_once dirname(__FILE__) . '/config.php';
 
-$parser = new Console_CommandLine();
-$parser->description = '';
-$parser->version = VERSION;
-$parser->addArgument('type', array('description' => "all: alllog, slow: スロークエリログ, req: リクエストログCSV"));
-$parser->addArgument('files', array('multiple' => true, 'description' => "入力ファイル一覧"));
-$parser->addOption('output', array('long_name' => '--output', 'action' => 'StoreString', 'description' => "出力ファイル名。 default=標準出力"));
-$parser->addOption('format', array('long_name' => '--format', 'action' => 'StoreString', 'choices' => array('csv','json'), 'description' => "出力形式(csv,json)。default: json"));
-$parser->addOption('from', array('long_name' => '--from', 'action' => 'StoreString', 'description' => "解析の開始時刻(strtotimeが解析可能な書式)。"));
-$parser->addOption('to',   array('long_name' => '--to',   'action' => 'StoreString', 'description' => "解析の終了時刻(strtotimeが解析可能な書式)。"));
-
-
 try {
     
+    //Normalizerのプラグインのロード
     $pluginManager = new Plugin_Manager();
-    $pluginManager->loadPlugins(PLUGIN_DIR);
+    $pluginManager->loadPlugins(PLUGIN_CONFIG_FILE);
+    $normalizers = $pluginManager->getPluginsByType(Normalizer_Plugin::TYPE);
     
-    //サブコマンドの一覧を作成する。
-    $plugins = $pluginManager->getPluginsByType(Normalizer_Plugin::TYPE);
-    foreach($plugins as $name=>$plugin) {
-        $definition = $plugin->getCommandDefinition();
-        $parser->addCommand($definition['name']);
-    }
+    $normalizerManager = new Normalizer_Manager();
+    $normalizerManager->addNormalizers($normalizers);
+    $commandNameList = $normalizerManager->getCommandNameList();
     
+    //コマンドラインパーサの準備
+    $parser = new Console_CommandLine();
+    $parser->description = '';
+    $parser->version = VERSION;
+    $parser->addArgument('type', array('description' => '入力データのタイプ。(' . implode(',', $commandNameList) . ')', 'choices'=>$commandNameList));
+    $parser->addArgument('files', array('multiple' => true, 'description' => "入力ファイル一覧"));
+    $parser->addOption('output', array('long_name' => '--output', 'action' => 'StoreString', 'description' => "出力ファイル名。 default=標準出力"));
+    $parser->addOption('format', array('long_name' => '--format', 'action' => 'StoreString', 'choices' => array('csv','json'), 'description' => "出力形式(csv,json)。default: json"));
+    $parser->addOption('from', array('long_name' => '--from', 'action' => 'StoreString', 'description' => "解析の開始時刻(strtotimeが解析可能な書式)。"));
+    $parser->addOption('to',   array('long_name' => '--to',   'action' => 'StoreString', 'description' => "解析の終了時刻(strtotimeが解析可能な書式)。"));
+    
+    //プラグイン固有のConsole_CommandLine拡張処理を実行する。
+    $normalizerManager->onInitCommand($parser);
+    
+    //コマンドラインの解析
     $parsedParams = $parser->parse();
     
-    $plugin = Normalizer_Plugin::getPluginByCommandName($plugins, $parsedParams->command_name);
-    $plugin->validateParams();
-    $plugin->normalize();
+    //解析の実行。
+    $normalizer = $normalizerManager->getNormalizer($parsedParams->args['type']);
+    $normalizer->initPlugin($parsedParams->options);
+    $normalizer->normalize($parsedParams->args['files']);
     
     //ソートした結果を指定されたフォーマットで出力する。
     $format = isset($parsedParams->options['format']) ? $parsedParams->options['format'] : 'json';
@@ -50,7 +54,5 @@ try {
     echo "Error: \n";
     echo $e->getMessage() . "\n";
     echo "\n---------------------------------------------------\n";
-    $parser->displayUsage();
 }
-
 
