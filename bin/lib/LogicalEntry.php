@@ -70,7 +70,9 @@ class LogicalEntry {
         if(isset($this->extraData[$key])) {
             if(is_array($this->extraData[$key])) {
                 //TODO: 大量のレコード追加を防ぐために、ここで防止する処理が必要かもしれない。
-                $this->extraData[$key][] = $value;
+                if(count($this->extraData[$key]) < 10) {
+                    $this->extraData[$key][] = $value;
+                }
             } else {
                 $this->extraData[$key] = array($this->extraData[$key], $value);
             }

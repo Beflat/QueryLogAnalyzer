@@ -39,6 +39,7 @@ class AllLog_Parser {
         $lineParser = new AllLog_LineParser();
         //最初のヘッダー部分を読み飛ばす
         $lineParser->skipHeader($this->fileReader);
+        $lineParser->skipUntilTime($this->fileReader, $this->from);
         
         $currentTime = 0;
         $this->results = array();

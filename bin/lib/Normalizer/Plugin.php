@@ -55,7 +55,7 @@ abstract class Normalizer_Plugin implements Normalizer_Plugin_Interface {
      * @param  array $options オプション情報を含んだ配列
      */
     public function initPlugin($options) {
-        $this->options;
+        $this->options = $options;
     }
     
     

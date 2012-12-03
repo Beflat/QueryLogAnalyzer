@@ -25,6 +25,36 @@ class AllLog_LineParser {
     }
     
     /**
+     * 指定された時間まで読み飛ばす。
+     * @param  [type] $startTime [description]
+     * @return [type]            [description]
+     */
+    public function skipUntilTime($fileReader, $startTime) {
+        while(!$fileReader->isEof()) {
+            //次の行を調べる(カーソルは進めない)
+            $try = $fileReader->tryLine();
+            
+            $matched = array();
+            if(!preg_match('#^([0-9]+\s+[0-9:]+)#', $try, $matched)) {
+                //時刻ではない行の場合は次の行へスキップ
+                $fileReader->getLine();
+                continue;
+            }
+            
+            //時刻らしい行を見つけた
+            $time = $this->convertLogDateToTimeStamp($matched[1]);
+            if($time < $startTime) {
+                //指定の時刻よりも前であれば次の行へスキップ。
+                $fileReader->getLine();
+                continue;
+            }
+            //指定時刻を過ぎた時点で処理を抜ける。
+            return;
+        }
+    }
+    
+    
+    /**
      * 渡された行がAllログのフォーマットとして有効かどうかを判定する
      * @param string $line
      * @return boolean 
