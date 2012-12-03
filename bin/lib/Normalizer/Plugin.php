@@ -24,7 +24,7 @@ abstract class Normalizer_Plugin implements Normalizer_Plugin_Interface {
      * プラグイン名を返す。
      * @return string
      */
-    abstract public function getName();
+    //abstract public function getName();
     
     
     /**
@@ -36,7 +36,7 @@ abstract class Normalizer_Plugin implements Normalizer_Plugin_Interface {
     }
     
     
-    abstract public function getCommandName();
+    //abstract public function getCommandName();
     
     /**
      * コマンドラインパーサーの初期化時、プラグイン固有の処理を実行するために呼び出されるメソッド。
@@ -74,12 +74,12 @@ abstract class Normalizer_Plugin implements Normalizer_Plugin_Interface {
      * @param array $files 処理対象のファイル一覧
      * @return void
      */
-    abstract public function normalize($files);
+    //abstract public function normalize($files);
     
     
     /**
      * 変換結果を返す。
      * @return array 変換結果のLogicalEntryを含んだ配列
      */
-    abstract public function getResult();
+    //abstract public function getResult();
 }
