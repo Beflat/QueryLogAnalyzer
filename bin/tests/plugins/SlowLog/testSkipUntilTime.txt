@@ -1,0 +1,35 @@
+/usr/libexec/mysqld, Version: 5.5.27-log (MySQL Community Server (GPL)). started with:
+Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
+Time                 Id Command    Argument
+# Time: 121124  2:15:53
+# User@Host: root[root] @ localhost []
+# Query_time: 3.070642  Lock_time: 0.000150 Rows_sent: 0  Rows_examined: 0
+use mysqlslap;
+SET timestamp=1353690953;
+CREATE TABLE `t1` (id serial,id0 varchar(32) unique key,id1 varchar(32) unique key,id2 varchar(32) unique key,id3 varchar(32) unique key,id4 varchar(32) unique key,id5 varchar(32) unique key,id6 varchar(32) unique key,id7 varchar(32) unique key,id8 varchar(32) unique key,id9 varchar(32) unique key,id10 varchar(32) unique key,id11 varchar(32) unique key,id12 varchar(32) unique key,id13 varchar(32) unique key,id14 varchar(32) unique key,id15 varchar(32) unique key,id16 varchar(32) unique key,id17 varchar(32) unique key,id18 varchar(32) unique key,id19 varchar(32) unique key,intcol1 INT(32) ,charcol1 VARCHAR(128))
+# Time: 121124  2:15:57
+# User@Host: root[root] @ localhost []
+# Query_time: 1.108533  Lock_time: 0.000065 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690957;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '64';
+# User@Host: root[root] @ localhost []
+# Query_time: 1.807500  Lock_time: 0.000234 Rows_sent: 0  Rows_examined: 0
+SET timestamp=1353690957;
+INSERT INTO t1 VALUES (NULL,uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),uuid(),866596855,'naQuzhMt1IrZIJMkbLAKBNNKKK2sCknzI5uHeGAgQuDd5SLgpN0smODyc7qorTo1QaI5qLl97qmCIzl0Mds81x7TxpIoJyqlY0iEDRNKA1PS0AKEn5NhuMAr3KgEIM')
+# Time: 121124  2:16:00
+# User@Host: root[root] @ localhost []
+# Query_time: 4.218461  Lock_time: 0.000099 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690960;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '96';
+# User@Host: root[root] @ localhost []
+# Query_time: 4.120529  Lock_time: 0.000047 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690960;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '14';
+# User@Host: root[root] @ localhost []
+# Query_time: 4.120571  Lock_time: 0.000045 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690960;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '85';
+# Time: 121124  2:16:04
+# User@Host: root[root] @ localhost []
+# Query_time: 1.123162  Lock_time: 0.000047 Rows_sent: 0  Rows_examined: 0
+SET timestamp=1353690964;

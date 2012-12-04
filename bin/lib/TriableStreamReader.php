@@ -42,12 +42,13 @@ class TriableStreamReader {
      * @return string
      */
     public function getLine() {
-        $this->lineNo++;
         if($this->tryBuffer !== null) {
             $buffer = $this->tryBuffer;
             $this->tryBuffer = null;
+            $this->lineNo++;
             return $buffer;
         }
+        $this->lineNo++;
         return rtrim(fgets($this->fd, 4096), "\r\n");
     }
     
@@ -76,6 +77,9 @@ class TriableStreamReader {
     
     
     public function getLineNo() {
+        if($this->tryBuffer !== null) {
+            return $this->lineNo+1;
+        }
         return $this->lineNo;
     }
 }

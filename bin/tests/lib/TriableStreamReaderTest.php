@@ -45,4 +45,37 @@ class TriableStreamReaderTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('c', $read);
         $this->assertTrue($reader->isEof());
     }
+    
+    
+    public function testLineNo() {
+        $reader = new TriableStreamReader(fopen(dirname(__FILE__) . '/testLineNo.txt', 'r'));
+        
+        //読み込む前は0
+        $this->assertEquals(0, $reader->getLineNo());
+        
+        //getLine()を呼ぶと増える
+        $reader->getLine();
+        $this->assertEquals(1, $reader->getLineNo());
+        
+        //tryLine()を呼ぶと増える
+        $reader->tryLine();
+        $this->assertEquals(2, $reader->getLineNo());
+        
+        //tryLine()の後にgetLineを呼び出しても変わらない
+        $reader->getLine();
+        $this->assertEquals(2, $reader->getLineNo());
+        
+        $reader->getLine();
+        $this->assertEquals(3, $reader->getLineNo());
+        
+        $reader->getLine();
+        $this->assertTrue($reader->isEof());
+        
+        //EOF時点では実際の行番号よりも1大きくなる。
+        $this->assertEquals(4, $reader->getLineNo());
+        
+        // //EOF後にgetLine()を呼んでも行番号は増えない。
+        // $reader->getLine();
+        // $this->assertEquals(5, $reader->getLineNo());
+    }
 }
