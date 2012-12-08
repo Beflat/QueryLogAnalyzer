@@ -1,0 +1,29 @@
+/usr/libexec/mysqld, Version: 5.5.27-log (MySQL Community Server (GPL)). started with:
+Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
+Time                 Id Command    Argument
+# Time: 121124  2:16:00
+# User@Host: root[root] @ localhost []
+# Query_time: 4.361250  Lock_time: 0.000048 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690960;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '86';
+# User@Host: root[root] @ localhost []
+# Query_time: 4.362204  Lock_time: 0.000035 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690960;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '77';
+# User@Host: root[root] @ localhost []
+# Query_time: 2.945845  Lock_time: 0.000371 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690960;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '76';
+# User@Host: root[root] @ localhost []
+# Query_time: 4.457399  Lock_time: 0.000039 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353690960;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '41';
+# Time: 121124  2:16:04
+# User@Host: root[root] @ localhost []
+# Query_time: 1.021356  Lock_time: 0.000115 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353691000;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '64';
+# User@Host: root[root] @ localhost []
+# Query_time: 1.021003  Lock_time: 0.000071 Rows_sent: 1  Rows_examined: 1
+SET timestamp=1353691000;
+SELECT intcol1,charcol1 FROM t1 WHERE id =  '42';

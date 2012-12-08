@@ -65,14 +65,17 @@ class SlowLog_LineParserTest extends PHPUnit_Framework_TestCase {
         $fileReader = new TriableStreamReader(fopen(dirname(__FILE__) . '/testParse1Line.txt', 'r'));
         $lineParser->skipHeader($fileReader);
         
-        $parsedData = $lineParser->parseLine($filereader);
-        //$this->assertEquals('2012-11-24 02:15:49', date('Y-m-d H:i:s', $parsedData['from']));
+        $parsedData = $lineParser->parseLine($fileReader);
+        
+        $this->assertEquals('2012-11-24 02:15:49', date('Y-m-d H:i:s', $parsedData['from']));
         $this->assertEquals('2012-11-24 02:15:53', date('Y-m-d H:i:s', $parsedData['to']));
-        //$this->assertEquals('2012-11-24 02:15:49', date('Y-m-d H:i:s', $parsedData['connection']));
-        //$this->assertEquals('2012-11-24 02:15:49', date('Y-m-d H:i:s', $parsedData['elapsed']));
-        //$this->assertEquals('2012-11-24 02:15:49', date('Y-m-d H:i:s', $parsedData['lock_time']));
-        //$this->assertEquals('2012-11-24 02:15:49', date('Y-m-d H:i:s', $parsedData['rows_sent']));
-        //$this->assertEquals('2012-11-24 02:15:49', date('Y-m-d H:i:s', $parsedData['rows_examined']));
+        $this->assertEquals('root[root]', $parsedData['user']);
+        $this->assertEquals('localhost []', $parsedData['host']);
+        $this->assertEquals('3.070642', $parsedData['elapsed']);
+        $this->assertEquals('0.000150', $parsedData['lock_time']);
+        $this->assertEquals('1', $parsedData['rows_sent']);
+        $this->assertEquals('10', $parsedData['rows_examined']);
+        $this->assertEquals("use mysqlslap;\nSET timestamp=1353690953;\nCREATE TABLE `t1` \n", $parsedData['query']);
     }
     
 }

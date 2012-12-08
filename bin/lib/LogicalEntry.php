@@ -44,7 +44,7 @@ class LogicalEntry {
     protected $sortKey;
     
     
-    public function __construct($id) {
+    public function __construct($id=null) {
         $this->id = $id;
         $this->from = 0;
         $this->to = 0;

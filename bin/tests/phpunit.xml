@@ -21,6 +21,7 @@
 <testsuites>
   <testsuite name="My Test Suite">
     <directory>lib</directory>
+    <directory>plugins</directory>
   </testsuite>
 </testsuites>
 

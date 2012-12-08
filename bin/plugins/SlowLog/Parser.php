@@ -45,8 +45,8 @@ class SlowLog_Parser {
         $this->results = array();
         while(!$this->fileReader->isEof()) {
             $parsedLine = $lineParser->parseLine($this->fileReader);
-            if(isset($parsedLine['time'])) {
-                $currentTime = $parsedLine['time'];
+            if(isset($parsedLine['to'])) {
+                $currentTime = $parsedLine['to'];
             }
             
             if($this->from > 0 && $currentTime < $this->from) {
@@ -56,12 +56,18 @@ class SlowLog_Parser {
                 break;
             }
             
-            $entry = new LogicalEntry($parsedLine['id']);
+            if(!isset($parsedLine['to'])) {
+                $parsedLine['to'] = $currentTime;
+                $parsedLine['from'] = $parsedLine['to'] - $parsedLine['elapsed'];
+            }
+            
+            $entry = new LogicalEntry();
             $entry->setFrom($parsedLine['from']);
             $entry->setTo($parsedLine['to']);
             $entry->setElapsed($parsedLine['elapsed']);
             
-            $entry->setExtra('connection', $parsedLine['connection']);
+            $entry->setExtra('host', $parsedLine['host']);
+            $entry->setExtra('user', $parsedLine['user']);
             $entry->setExtra('lock_time', $parsedLine['lock_time']);
             $entry->setExtra('rows_sent', $parsedLine['rows_sent']);
             $entry->setExtra('rows_examined', $parsedLine['rows_examined']);
