@@ -62,7 +62,7 @@ class SlowLog_Parser {
             }
             
             $entry = new LogicalEntry();
-            $entry->setFrom($parsedLine['from']);
+            $entry->setFrom((int)$parsedLine['from']);
             $entry->setTo($parsedLine['to']);
             $entry->setElapsed($parsedLine['elapsed']);
             

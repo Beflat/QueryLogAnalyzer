@@ -28,5 +28,6 @@ try {
 } catch(Exception $e) {
     echo "Error: \n";
     echo $e->getMessage() . "\n";
+    echo $e->getTraceAsString();
 }
 

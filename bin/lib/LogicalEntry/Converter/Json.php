@@ -25,7 +25,10 @@ class LogicalEntry_Converter_Json implements LogicalEntry_Converter_Interface {
         
         fputs($fp, "[\n");
         
-        $lastEntryIndex = count($entries) - 1;
+        
+        end($entries);
+        $lastEntryIndex = key($entries);
+        reset($entries);
         foreach($entries as $idx=>$entry) {
             $first = false;
             $data = array(
